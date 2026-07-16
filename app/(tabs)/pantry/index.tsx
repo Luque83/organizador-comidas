@@ -159,7 +159,7 @@ export default function PantryScreen({ isEmbedded }: { isEmbedded?: boolean }) {
             <PantryItemCard
               item={item}
               ingredientName={getIngredientName(item.ingredientId) ?? item.customName ?? undefined}
-              onPress={() => router.push({ pathname: '/(tabs)/pantry/[id]', params: { id: item.id } })}
+              onPress={() => (router.push as any)({ pathname: '/(tabs)/pantry/[id]', params: { id: item.id } })}
             />
           )}
           stickySectionHeadersEnabled

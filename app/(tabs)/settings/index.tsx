@@ -10,8 +10,10 @@ import { Toast } from '@/components/ui/Toast';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { exportBackup, importBackup } from '@/services/backupService';
 import * as DocumentPicker from 'expo-document-picker';
+import { useRouter } from 'expo-router';
 
 export default function SettingsScreen() {
+  const router = useRouter();
   const colors = useThemeColors();
   const settings = useSettingsStore(s => s.settings);
   const updateSettings = useSettingsStore(s => s.update);
@@ -66,6 +68,21 @@ export default function SettingsScreen() {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
+        {/* Cuenta */}
+        <SettingSection title="👤 Cuenta">
+          <TouchableOpacity
+            style={[styles.actionRow, { backgroundColor: colors.backgroundSecondary }]}
+            onPress={() => router.push('/(tabs)/settings/profile')}
+          >
+            <Ionicons name="person-circle-outline" size={24} color={colors.primary} />
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.actionLabel, { color: colors.text }]}>Mi Perfil</Text>
+              <Text style={[styles.actionHint, { color: colors.textSecondary }]}>Gestionar cuenta y cerrar sesión</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />
+          </TouchableOpacity>
+        </SettingSection>
+
         {/* Preferencias de comida */}
         <SettingSection title="🍽️ Preferencias de comida">
           <SettingRow

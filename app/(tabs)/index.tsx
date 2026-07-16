@@ -149,7 +149,7 @@ export default function HomeScreen() {
             value={String(todayMeals.length)}
             color={colors.primary}
             bg={colors.primarySurface}
-            onPress={() => router.push('/(tabs)/week')}
+            onPress={() => router.push('/(tabs)/plan')}
           />
           <SummaryCard
             icon="alert-circle"
@@ -178,7 +178,7 @@ export default function HomeScreen() {
         </View>
 
         {/* Comidas de hoy */}
-        <SectionHeader title="Comidas de hoy" icon="today" onPress={() => router.push('/(tabs)/week')} />
+        <SectionHeader title="Comidas de hoy" icon="today" onPress={() => router.push('/(tabs)/plan')} />
         {todayMeals.length === 0 ? (
           <View style={[styles.emptyCard, { backgroundColor: colors.backgroundCard }]}>
             <Text style={styles.emptyEmoji}>🌟</Text>

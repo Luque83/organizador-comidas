@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { initDatabase } from '@/database/db';
 import { runSeed } from '@/database/seed';
 import { useSettingsStore } from '@/store/useSettingsStore';
@@ -14,6 +14,65 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { format, startOfWeek } from 'date-fns';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { useHouseholdStore } from '@/store/useHouseholdStore';
+
+function RootLayoutNav() {
+  const { session, isLoading: authLoading } = useAuth();
+  const { activeHousehold, isLoading: householdLoading, loadHouseholds } = useHouseholdStore();
+  const router = useRouter();
+  const segments = useSegments();
+
+  useEffect(() => {
+    if (session) {
+      loadHouseholds();
+    }
+  }, [session]);
+
+  useEffect(() => {
+    if (authLoading || (session && householdLoading)) return;
+
+    const inAuthGroup = segments[0] === 'auth';
+    const inHouseholdsGroup = segments[0] === 'households';
+
+    if (!session && !inAuthGroup) {
+      // Redirigir al login si no hay sesión y no estamos en /auth
+      router.replace('/auth/login');
+    } else if (session && !inHouseholdsGroup && !activeHousehold) {
+      // Redirigir a households si hay sesión pero no hay hogar activo
+      router.replace('/households');
+    } else if (session && inAuthGroup) {
+      // Si estamos en auth y ya hay sesión, vamos a tabs (o households si no hay)
+      if (activeHousehold) {
+        router.replace('/(tabs)');
+      } else {
+        router.replace('/households');
+      }
+    }
+  }, [session, authLoading, householdLoading, activeHousehold, segments]);
+
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="auth" options={{ headerShown: false }} />
+      <Stack.Screen name="households" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="modals/add-meal"
+        options={{
+          presentation: 'modal',
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="modals/recipe-picker"
+        options={{
+          presentation: 'modal',
+          headerShown: false,
+        }}
+      />
+    </Stack>
+  );
+}
 
 export default function RootLayout() {
   const [isReady, setIsReady] = useState(false);
@@ -29,7 +88,7 @@ export default function RootLayout() {
   useEffect(() => {
     async function initialize() {
       try {
-        // 1. Inicializar la base de datos
+        // 1. Inicializar la base de datos local
         await initDatabase();
         // 2. Insertar datos iniciales si es el primer inicio
         await runSeed();
@@ -70,27 +129,13 @@ export default function RootLayout() {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="modals/add-meal"
-            options={{
-              presentation: 'modal',
-              headerShown: false,
-            }}
-          />
-          <Stack.Screen
-            name="modals/recipe-picker"
-            options={{
-              presentation: 'modal',
-              headerShown: false,
-            }}
-          />
-        </Stack>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+    <AuthProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <SafeAreaProvider>
+          <RootLayoutNav />
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    </AuthProvider>
   );
 }
 

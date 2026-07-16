@@ -15,6 +15,24 @@ export default function TabsLayout() {
   const settings = useSettingsStore(s => s.settings);
   const pantryItems = usePantryStore(s => s.items);
 
+  React.useEffect(() => {
+    // Intentar subir operaciones cacheadas localmente que fallaron por falta de internet
+    const startSync = async () => {
+      const { SyncEngine } = await import('@/lib/syncEngine');
+      SyncEngine.pushPendingChanges();
+      
+      // Suscribirse a cambios en tiempo real
+      const cleanup = SyncEngine.startRealtimeSync();
+      return cleanup;
+    };
+    
+    const cleanupPromise = startSync();
+    
+    return () => {
+      cleanupPromise.then(cleanup => cleanup && cleanup());
+    };
+  }, []);
+
   const pendingItems = shoppingItems.filter(i => !i.isBought).length;
   const expiryDays = settings?.expiryAlertDays ?? 3;
   const today = new Date().toISOString().split('T')[0];

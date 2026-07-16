@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS user_settings (
 -- Catálogo de ingredientes
 CREATE TABLE IF NOT EXISTS ingredients (
   id TEXT PRIMARY KEY,
+  household_id TEXT,
   name TEXT NOT NULL,
   normalized_name TEXT NOT NULL,
   category TEXT NOT NULL,
@@ -42,6 +43,8 @@ CREATE TABLE IF NOT EXISTS ingredients (
   fat REAL,
   is_basic INTEGER NOT NULL DEFAULT 0,
   notes TEXT,
+  created_by TEXT,
+  updated_by TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
@@ -72,6 +75,7 @@ CREATE TABLE IF NOT EXISTS ingredient_conversions (
 -- Recetas
 CREATE TABLE IF NOT EXISTS recipes (
   id TEXT PRIMARY KEY,
+  household_id TEXT,
   name TEXT NOT NULL,
   description TEXT,
   image_uri TEXT,
@@ -87,6 +91,8 @@ CREATE TABLE IF NOT EXISTS recipes (
   is_favorite INTEGER NOT NULL DEFAULT 0,
   diet_tags TEXT NOT NULL DEFAULT '[]',
   allergens TEXT NOT NULL DEFAULT '[]',
+  created_by TEXT,
+  updated_by TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
@@ -123,9 +129,12 @@ CREATE INDEX IF NOT EXISTS idx_recipe_steps_recipe ON recipe_steps(recipe_id);
 -- Planes de menú semanal
 CREATE TABLE IF NOT EXISTS meal_plans (
   id TEXT PRIMARY KEY,
+  household_id TEXT,
   week_start TEXT NOT NULL UNIQUE,
   notes TEXT,
   budget REAL,
+  created_by TEXT,
+  updated_by TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
@@ -156,6 +165,7 @@ CREATE INDEX IF NOT EXISTS idx_planned_meals_date ON planned_meals(date);
 -- Almacén (productos en casa)
 CREATE TABLE IF NOT EXISTS pantry_items (
   id TEXT PRIMARY KEY,
+  household_id TEXT,
   ingredient_id TEXT,
   custom_name TEXT,
   quantity REAL NOT NULL DEFAULT 0,
@@ -170,6 +180,8 @@ CREATE TABLE IF NOT EXISTS pantry_items (
   is_open INTEGER NOT NULL DEFAULT 0,
   opened_date TEXT,
   batch_id TEXT,
+  created_by TEXT,
+  updated_by TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now')),
   FOREIGN KEY (ingredient_id) REFERENCES ingredients(id) ON DELETE SET NULL
@@ -178,15 +190,30 @@ CREATE INDEX IF NOT EXISTS idx_pantry_ingredient ON pantry_items(ingredient_id);
 CREATE INDEX IF NOT EXISTS idx_pantry_location ON pantry_items(location);
 CREATE INDEX IF NOT EXISTS idx_pantry_expiry ON pantry_items(expiry_date);
 
+-- Cola de sincronización Offline-First
+CREATE TABLE IF NOT EXISTS pending_sync_operations (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  table_name TEXT NOT NULL,
+  record_id TEXT NOT NULL,
+  operation TEXT NOT NULL CHECK (operation IN ('INSERT', 'UPDATE', 'DELETE')),
+  data TEXT, -- JSON con los datos de la fila
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  retry_count INTEGER NOT NULL DEFAULT 0,
+  last_error TEXT
+);
+
 -- Listas de la compra
 CREATE TABLE IF NOT EXISTS shopping_lists (
   id TEXT PRIMARY KEY,
+  household_id TEXT,
   name TEXT NOT NULL,
   week_start TEXT,
   is_active INTEGER NOT NULL DEFAULT 1,
   total_estimated REAL,
   total_actual REAL,
   completed_at TEXT,
+  created_by TEXT,
+  updated_by TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
@@ -194,6 +221,7 @@ CREATE TABLE IF NOT EXISTS shopping_lists (
 -- Ítems de la lista de la compra
 CREATE TABLE IF NOT EXISTS shopping_items (
   id TEXT PRIMARY KEY,
+  household_id TEXT,
   shopping_list_id TEXT NOT NULL,
   ingredient_id TEXT,
   name TEXT NOT NULL,
@@ -207,6 +235,8 @@ CREATE TABLE IF NOT EXISTS shopping_items (
   price REAL,
   store TEXT,
   notes TEXT,
+  created_by TEXT,
+  updated_by TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   FOREIGN KEY (shopping_list_id) REFERENCES shopping_lists(id) ON DELETE CASCADE,
   FOREIGN KEY (ingredient_id) REFERENCES ingredients(id) ON DELETE SET NULL

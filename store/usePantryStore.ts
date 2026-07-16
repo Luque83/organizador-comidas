@@ -39,21 +39,56 @@ export const usePantryStore = create<PantryState>((set, get) => ({
   addItem: async (item) => {
     const id = uuidv4();
     const now = new Date().toISOString();
+    
+    // Obtener datos de sincronización
+    const { useHouseholdStore } = await import('@/store/useHouseholdStore');
+    const { supabase } = await import('@/lib/supabase');
+    const householdId = useHouseholdStore.getState().activeHousehold?.id || null;
+    const { data: { user } } = await supabase.auth.getUser();
+    const userId = user?.id || null;
+
+    const rowData = {
+      id, 
+      household_id: householdId,
+      ingredient_id: item.ingredientId ?? null, 
+      custom_name: item.customName ?? null,
+      quantity: item.quantity, 
+      unit: item.unit, 
+      min_quantity: item.minQuantity ?? null,
+      location: item.location, 
+      purchase_date: item.purchaseDate ?? null, 
+      expiry_date: item.expiryDate ?? null,
+      brand: item.brand ?? null, 
+      price: item.price ?? null, 
+      notes: item.notes ?? null,
+      is_open: item.isOpen ? 1 : 0, 
+      opened_date: item.openedDate ?? null, 
+      batch_id: item.batchId ?? null,
+      created_by: userId,
+      updated_by: userId,
+      created_at: now, 
+      updated_at: now
+    };
+
     await executeRun(
       `INSERT INTO pantry_items (
-        id, ingredient_id, custom_name, quantity, unit, min_quantity,
+        id, household_id, ingredient_id, custom_name, quantity, unit, min_quantity,
         location, purchase_date, expiry_date, brand, price, notes,
-        is_open, opened_date, batch_id, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        is_open, opened_date, batch_id, created_by, updated_by, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        id, item.ingredientId ?? null, item.customName ?? null,
-        item.quantity, item.unit, item.minQuantity ?? null,
-        item.location, item.purchaseDate ?? null, item.expiryDate ?? null,
-        item.brand ?? null, item.price ?? null, item.notes ?? null,
-        item.isOpen ? 1 : 0, item.openedDate ?? null, item.batchId ?? null,
-        now, now,
+        rowData.id, rowData.household_id, rowData.ingredient_id, rowData.custom_name, 
+        rowData.quantity, rowData.unit, rowData.min_quantity, rowData.location, 
+        rowData.purchase_date, rowData.expiry_date, rowData.brand, rowData.price, 
+        rowData.notes, rowData.is_open, rowData.opened_date, rowData.batch_id, 
+        rowData.created_by, rowData.updated_by, rowData.created_at, rowData.updated_at
       ]
     );
+
+    // Encolar sincronización
+    const { SyncEngine } = await import('@/lib/syncEngine');
+    await SyncEngine.queueOperation('pantry_items', id, 'INSERT', rowData);
+
     await get().load();
     return id;
   },
@@ -62,6 +97,7 @@ export const usePantryStore = create<PantryState>((set, get) => ({
     const current = get().items.find(i => i.id === id);
     if (!current) return;
     const updated = { ...current, ...updates, updatedAt: new Date().toISOString() };
+    
     await executeRun(
       `UPDATE pantry_items SET
         ingredient_id = ?, custom_name = ?, quantity = ?, unit = ?,
@@ -78,6 +114,20 @@ export const usePantryStore = create<PantryState>((set, get) => ({
         id,
       ]
     );
+
+    // Encolar sincronización
+    const { SyncEngine } = await import('@/lib/syncEngine');
+    const { useHouseholdStore } = await import('@/store/useHouseholdStore');
+    const householdId = useHouseholdStore.getState().activeHousehold?.id || null;
+    
+    await SyncEngine.queueOperation('pantry_items', id, 'UPDATE', {
+      id, household_id: householdId, ingredient_id: updated.ingredientId ?? null, custom_name: updated.customName ?? null,
+      quantity: updated.quantity, unit: updated.unit, min_quantity: updated.minQuantity ?? null,
+      location: updated.location, purchase_date: updated.purchaseDate ?? null, expiry_date: updated.expiryDate ?? null,
+      brand: updated.brand ?? null, price: updated.price ?? null, notes: updated.notes ?? null,
+      is_open: updated.isOpen ? 1 : 0, opened_date: updated.openedDate ?? null, updated_at: updated.updatedAt
+    });
+
     set(state => ({
       items: state.items.map(i => i.id === id ? updated : i),
     }));
@@ -85,10 +135,23 @@ export const usePantryStore = create<PantryState>((set, get) => ({
 
   updateQuantity: async (id, newQuantity) => {
     const qty = Math.max(0, newQuantity);
+    const now = new Date().toISOString();
     await executeRun(
       'UPDATE pantry_items SET quantity = ?, updated_at = ? WHERE id = ?',
-      [qty, new Date().toISOString(), id]
+      [qty, now, id]
     );
+
+    // Encolar sincronización (solo mandamos los campos modificados en la cola local, el SyncEngine hará UPSERT o usará un RPC)
+    // Para simplificar el UPSERT, deberíamos mandar todo el objeto actualizado, así que lo buscamos:
+    const item = get().items.find(i => i.id === id);
+    if (item) {
+      const { SyncEngine } = await import('@/lib/syncEngine');
+      const { useHouseholdStore } = await import('@/store/useHouseholdStore');
+      await SyncEngine.queueOperation('pantry_items', id, 'UPDATE', {
+        id, household_id: useHouseholdStore.getState().activeHousehold?.id || null, quantity: qty, updated_at: now
+      });
+    }
+
     set(state => ({
       items: state.items.map(i => i.id === id ? { ...i, quantity: qty } : i),
     }));
@@ -96,6 +159,11 @@ export const usePantryStore = create<PantryState>((set, get) => ({
 
   deleteItem: async (id) => {
     await executeRun('DELETE FROM pantry_items WHERE id = ?', [id]);
+    
+    // Encolar sincronización
+    const { SyncEngine } = await import('@/lib/syncEngine');
+    await SyncEngine.queueOperation('pantry_items', id, 'DELETE', null);
+
     set(state => ({ items: state.items.filter(i => i.id !== id) }));
   },
 

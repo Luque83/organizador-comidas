@@ -20,10 +20,12 @@ interface HouseholdState {
   households: Household[];
   role: 'owner' | 'admin' | 'member' | 'viewer' | null;
   isLoading: boolean;
+  membersProfiles: Record<string, { display_name: string; role: string }>;
   loadHouseholds: () => Promise<void>;
   setActiveHousehold: (householdId: string) => Promise<void>;
   createHousehold: (name: string) => Promise<void>;
   joinHousehold: (inviteCode: string) => Promise<void>;
+  loadHouseholdProfiles: () => Promise<void>;
 }
 
 export const useHouseholdStore = create<HouseholdState>((set, get) => ({
@@ -31,6 +33,7 @@ export const useHouseholdStore = create<HouseholdState>((set, get) => ({
   households: [],
   role: null,
   isLoading: true,
+  membersProfiles: {},
 
   loadHouseholds: async () => {
     set({ isLoading: true });
@@ -75,6 +78,10 @@ export const useHouseholdStore = create<HouseholdState>((set, get) => ({
       role: newRole,
       isLoading: false 
     });
+
+    if (newActive) {
+      get().loadHouseholdProfiles();
+    }
   },
 
   setActiveHousehold: async (householdId: string) => {
@@ -90,6 +97,33 @@ export const useHouseholdStore = create<HouseholdState>((set, get) => ({
       .single();
 
     set({ activeHousehold: target, role: member?.role || 'member' });
+    get().loadHouseholdProfiles();
+  },
+
+  loadHouseholdProfiles: async () => {
+    const activeId = get().activeHousehold?.id;
+    if (!activeId) return;
+
+    const { data, error } = await supabase
+      .from('household_members')
+      .select(`
+        user_id,
+        role,
+        profiles ( display_name )
+      `)
+      .eq('household_id', activeId)
+      .eq('status', 'active');
+
+    if (!error && data) {
+      const profilesMap: Record<string, { display_name: string; role: string }> = {};
+      for (const member of data) {
+        profilesMap[member.user_id] = {
+          display_name: (member.profiles as any)?.display_name || 'Usuario',
+          role: member.role
+        };
+      }
+      set({ membersProfiles: profilesMap });
+    }
   },
 
   createHousehold: async (name: string) => {

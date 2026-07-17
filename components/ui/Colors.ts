@@ -5,109 +5,118 @@
 
 export const Colors = {
   light: {
-    // Fondo
-    background: '#FFF8F0',
-    backgroundCard: '#FFFFFF',
-    backgroundSecondary: '#F5EDE4',
-    backgroundInput: '#FAF5EE',
+    // Fondo más cálido
+    background: '#FFF5E8',
+    backgroundCard: '#FFFCF9',
+    backgroundSecondary: '#F2E8DF',
+    backgroundInput: '#F8F1EB',
 
-    // Primario: terracota / naranja cálido
-    primary: '#E8784A',
-    primaryDark: '#C45E32',
-    primaryLight: '#F4A47A',
-    primarySurface: '#FEF0E8',
+    // Primario: naranja terracota más vibrante para mayor contraste
+    primary: '#D65828',
+    primaryDark: '#B23A0D',
+    primaryLight: '#F49B75',
+    primarySurface: '#FDEAE3',
 
-    // Secundario: verde salvia suave
-    secondary: '#7BAF7A',
-    secondaryDark: '#5D9060',
-    secondaryLight: '#A8CFA7',
-    secondarySurface: '#EEF7EE',
+    // Secundario: verde salvia oscuro
+    secondary: '#508552',
+    secondaryDark: '#386339',
+    secondaryLight: '#94C696',
+    secondarySurface: '#E6F3E7',
 
-    // Acento: amarillo dorado
-    accent: '#E8A84A',
-    accentSurface: '#FEF5E8',
+    // Acento: ocre intenso
+    accent: '#D48C24',
+    accentSurface: '#FDF1DF',
 
     // Estado
-    success: '#4CAF7A',
-    successSurface: '#E8F5EE',
-    warning: '#E8A84A',
-    warningSurface: '#FEF5E8',
-    error: '#E05A5A',
-    errorSurface: '#FEEEEE',
-    info: '#5A9AE0',
-    infoSurface: '#EEF4FE',
+    success: '#3A965E',
+    successSurface: '#E3F4EB',
+    warning: '#D48C24',
+    warningSurface: '#FDF1DF',
+    error: '#D34242',
+    errorSurface: '#FCECEC',
+    info: '#4182D3',
+    infoSurface: '#E6EFFF',
 
-    // Texto
-    text: '#2D2416',
-    textSecondary: '#7A6552',
-    textTertiary: '#A89585',
+    // Texto - Más oscuros para máxima legibilidad
+    text: '#1F1712',
+    textSecondary: '#54463C',
+    textTertiary: '#8E7B6D',
     textOnPrimary: '#FFFFFF',
     textOnSecondary: '#FFFFFF',
-    textPlaceholder: '#C4B5A8',
+    textPlaceholder: '#B5A599',
 
     // Bordes
-    border: '#EAE0D5',
-    borderFocus: '#E8784A',
-    separator: '#F0E8DF',
+    border: '#E8DED6',
+    borderFocus: '#D65828',
+    separator: '#EDE4DC',
 
     // Tabs y navegación
-    tabBar: '#FFFFFF',
-    tabBarBorder: '#EAE0D5',
-    tabActive: '#E8784A',
-    tabInactive: '#B0A098',
+    tabBar: '#FFFCF9',
+    tabBarBorder: '#E8DED6',
+    tabActive: '#D65828',
+    tabInactive: '#968579',
 
     // Chips / Badges
-    chipBackground: '#F0E8DF',
+    chipBackground: '#EFE6DE',
     chipText: '#7A6552',
 
     // Sombras
-    shadowColor: '#2D2416',
+    shadowColor: '#1F1712',
   },
   dark: {
-    background: '#1A1410',
-    backgroundCard: '#261E18',
-    backgroundSecondary: '#2E2420',
-    backgroundInput: '#332822',
+    // Fondo más profundo pero cálido
+    background: '#181310',
+    backgroundCard: '#241D19',
+    backgroundSecondary: '#2E2520',
+    backgroundInput: '#201A16',
 
-    primary: '#F4916A',
-    primaryDark: '#E8784A',
-    primaryLight: '#F8B898',
-    primarySurface: '#2E1E16',
+    // Primario: brillante en fondo oscuro
+    primary: '#F07542',
+    primaryDark: '#E85B20',
+    primaryLight: '#F7A380',
+    primarySurface: '#3A2016',
 
-    secondary: '#8DC48C',
-    secondaryDark: '#7BAF7A',
-    secondaryLight: '#ADCFAC',
-    secondarySurface: '#1A2618',
+    // Secundario: verde vibrante
+    secondary: '#8ACD89',
+    secondaryDark: '#6BA86A',
+    secondaryLight: '#AEDCAE',
+    secondarySurface: '#243A24',
 
-    accent: '#F0BC70',
-    accentSurface: '#2E2418',
+    // Acento
+    accent: '#EFA642',
+    accentSurface: '#3A2816',
 
-    success: '#5DC48C',
-    successSurface: '#1A2822',
-    warning: '#F0BC70',
-    warningSurface: '#2E2418',
-    error: '#E87878',
-    errorSurface: '#2E1818',
-    info: '#78B4E8',
-    infoSurface: '#182430',
+    // Estado
+    success: '#6AC68D',
+    successSurface: '#1B3826',
+    warning: '#EFA642',
+    warningSurface: '#3A2816',
+    error: '#E86666',
+    errorSurface: '#3D1C1C',
+    info: '#66A5E8',
+    infoSurface: '#192C45',
 
-    text: '#F5EDE4',
-    textSecondary: '#C4B0A0',
-    textTertiary: '#8A7868',
-    textOnPrimary: '#FFFFFF',
-    textOnSecondary: '#FFFFFF',
-    textPlaceholder: '#5A4A3A',
+    // Texto - Alto contraste
+    text: '#FDF5F0',
+    textSecondary: '#C8B5A7',
+    textTertiary: '#948376',
+    textOnPrimary: '#1F1712',
+    textOnSecondary: '#1F1712',
+    textPlaceholder: '#7A6B60',
 
-    border: '#3A2E26',
-    borderFocus: '#F4916A',
-    separator: '#332822',
+    // Bordes
+    border: '#382D26',
+    borderFocus: '#F07542',
+    separator: '#2E2520',
 
-    tabBar: '#1E1612',
-    tabBarBorder: '#3A2E26',
-    tabActive: '#F4916A',
-    tabInactive: '#6A5848',
+    // Tabs y navegación
+    tabBar: '#241D19',
+    tabBarBorder: '#382D26',
+    tabActive: '#F07542',
+    tabInactive: '#7A6B60',
 
-    chipBackground: '#332822',
+    // Chips / Badges
+    chipBackground: '#332923',
     chipText: '#C4B0A0',
 
     shadowColor: '#000000',

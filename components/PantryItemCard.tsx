@@ -5,6 +5,7 @@ import { useThemeColors } from './ui/useThemeColors';
 import { PantryItem } from '@/types';
 import { STORAGE_LOCATIONS } from '@/types';
 import { formatQuantity } from '@/services/unitConversion';
+import { useHouseholdStore } from '@/store/useHouseholdStore';
 
 interface PantryItemCardProps {
   item: PantryItem;
@@ -15,6 +16,10 @@ interface PantryItemCardProps {
 
 export function PantryItemCard({ item, ingredientName, onPress, onQuickConsume }: PantryItemCardProps) {
   const colors = useThemeColors();
+  const membersProfiles = useHouseholdStore(s => s.membersProfiles);
+  const modifierId = item.updatedBy || item.createdBy;
+  const modifierName = modifierId ? (membersProfiles[modifierId]?.display_name || 'Alguien') : 'Alguien';
+  
   const today = new Date().toISOString().split('T')[0];
   const locationEmoji = STORAGE_LOCATIONS.find(l => l.value === item.location)?.emoji ?? '📦';
 
@@ -70,6 +75,11 @@ export function PantryItemCard({ item, ingredientName, onPress, onQuickConsume }
               </View>
             )}
           </View>
+          {(item.updatedBy || item.createdBy) && (
+            <Text style={[styles.modifierText, { color: colors.textTertiary, marginTop: 4, fontSize: 11 }]}>
+              Modificado por {modifierName}
+            </Text>
+          )}
         </View>
 
         <View style={styles.right}>

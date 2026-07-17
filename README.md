@@ -98,31 +98,49 @@ Organizador de comidas/
 │   └── index.ts
 └── tests/                   # Tests unitarios
     ├── unitConversion.test.ts
-    ├── ingredientMatcher.test.ts
-    └── shoppingCalculator.test.ts
+    ├── recommendationEngine.test.ts
+    └── shoppingListCalculator.test.ts
 ```
 
-## 🎨 Diseño
+## 🔄 Sincronización y Hogares (Supabase)
 
-La aplicación usa un sistema de diseño propio con:
-- **Paleta cálida**: terracota (#E8784A), verde salvia (#7BAF7A), crema (#FFF8F0)
-- **Modo claro/oscuro** totalmente personalizable
-- Componentes reutilizables con tokens de color centralizados
+La aplicación utiliza **Supabase** para ofrecer funcionalidades "Offline-First" con sincronización en tiempo real. 
 
-## 📐 Reglas de negocio importantes
+- **Offline-First**: Todo se guarda instantáneamente en SQLite. Si no hay conexión, se encola.
+- **Hogares**: Varios usuarios pueden unirse a un mismo hogar mediante un código de invitación.
+- **Sincronización**: Cuando recuperas conexión, se sincronizan los datos de tu hogar automáticamente.
 
-1. **Sin descuento automático**: Los ingredientes del almacén solo se descuentan cuando marcas una comida como "preparada"
-2. **FIFO para caducidades**: El sistema prioriza consumir antes los productos más próximos a caducar
-3. **Recomendaciones locales**: El motor de recomendaciones funciona 100% sin conexión a internet
-4. **Datos locales**: Toda la información se almacena en SQLite en el dispositivo
+### 📱 Testing con varios dispositivos (Dos móviles)
 
-## 🔮 Próximas versiones (roadmap)
+Para probar la sincronización en tiempo real entre dos móviles distintos, puedes seguir este flujo:
 
-- [ ] Compartir recetas con otros usuarios
-- [ ] Sincronización en la nube (opcional)
-- [ ] Escáner de códigos de barras para el almacén
-- [ ] Planificación nutricional
-- [ ] Importar recetas desde URLs
+1. **Configurar el entorno**: Asegúrate de tener tu `.env` con las claves de Supabase (`EXPO_PUBLIC_SUPABASE_URL` y `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`).
+2. **Levantar el servidor en tu red local**:
+   ```bash
+   npx expo start --lan
+   ```
+3. **Móvil 1 (El creador)**:
+   - Conéctate al mismo WiFi que el PC y escanea el código QR con **Expo Go**.
+   - Inicia sesión o regístrate en la app.
+   - Crea un "Hogar" (o ve a Ajustes -> Mi Hogar) y **copia el código de invitación**.
+   - Añade un producto a la Despensa.
+4. **Móvil 2 (El invitado)**:
+   - Escanea el mismo código QR con Expo Go en el segundo móvil.
+   - Regístrate con una cuenta diferente.
+   - Al entrar, selecciona **"Unirse con código"** y pega el código del Móvil 1.
+   - **¡Magia!** Verás el producto que el Móvil 1 añadió a la despensa (y dirá "Añadido por..."). Si el Móvil 2 modifica la cantidad, el Móvil 1 lo verá reflejado al instante.
 
----
-*Desarrollado con React Native + Expo — Funciona 100% offline*
+### 🚀 Compilación (EAS / TestFlight / APK)
+
+Para compilar la aplicación para su distribución (APK de Android o TestFlight en iOS) usamos Expo Application Services (EAS). Ya existe un archivo `eas.json` preconfigurado.
+
+1. Instala la CLI de EAS: `npm install -g eas-cli`
+2. Haz login: `eas login`
+3. Configura el proyecto: `eas build:configure`
+4. **Para Android (APK local o AppBundle)**: `eas build -p android --profile preview`
+5. **Para iOS (TestFlight)**: `eas build -p ios --profile production` (requiere cuenta de Apple Developer).
+
+## 📄 Licencia
+
+Este proyecto se distribuye bajo la licencia MIT.
+Siéntete libre de modificarlo, mejorarlo o usarlo como base para tus proyectos.

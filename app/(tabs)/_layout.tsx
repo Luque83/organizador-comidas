@@ -112,6 +112,8 @@ export default function TabsLayout() {
       <Tabs.Screen name="pantry/new" options={{ href: null }} />
       <Tabs.Screen name="shopping/index" options={{ href: null }} />
       <Tabs.Screen name="settings/index" options={{ href: null }} />
+      <Tabs.Screen name="settings/profile" options={{ href: null }} />
+      <Tabs.Screen name="settings/household" options={{ href: null }} />
       <Tabs.Screen name="week" options={{ href: null }} />
     </Tabs>
   );

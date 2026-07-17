@@ -213,6 +213,8 @@ function mapRowToPantryItem(row: Record<string, unknown>): PantryItem {
     isOpen: Boolean(Number(row.is_open ?? 0)),
     openedDate: row.opened_date ? String(row.opened_date) : null,
     batchId: row.batch_id ? String(row.batch_id) : null,
+    createdBy: row.created_by ? String(row.created_by) : null,
+    updatedBy: row.updated_by ? String(row.updated_by) : null,
     createdAt: String(row.created_at ?? ''),
     updatedAt: String(row.updated_at ?? ''),
   };

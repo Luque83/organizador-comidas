@@ -262,6 +262,8 @@ export interface PantryItem {
   isOpen: boolean;
   openedDate?: string | null;
   batchId?: string | null; // para agrupar lotes del mismo producto
+  createdBy?: string | null;
+  updatedBy?: string | null;
   createdAt: string;
   updatedAt: string;
 }

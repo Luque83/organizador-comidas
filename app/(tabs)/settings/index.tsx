@@ -81,6 +81,18 @@ export default function SettingsScreen() {
             </View>
             <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.actionRow, { backgroundColor: colors.backgroundSecondary, borderTopWidth: 1, borderTopColor: colors.separator }]}
+            onPress={() => router.push('/(tabs)/settings/household')}
+          >
+            <Ionicons name="home-outline" size={24} color={colors.primary} />
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.actionLabel, { color: colors.text }]}>Mi Hogar</Text>
+              <Text style={[styles.actionHint, { color: colors.textSecondary }]}>Gestionar miembros y compartir hogar</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />
+          </TouchableOpacity>
         </SettingSection>
 
         {/* Preferencias de comida */}

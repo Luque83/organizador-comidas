@@ -43,7 +43,8 @@
         {
           "photosPermission": "La app necesita acceso a tus fotos para añadir imágenes a las recetas."
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true

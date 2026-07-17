@@ -7,7 +7,7 @@ describe('ingredientMatcher', () => {
     });
     it('elimina tildes', () => {
       expect(normalizeName('Ají')).toBe('aji');
-      expect(normalizeName('Piñones')).toBe(expect.stringMatching(/pinones|pi.ones/));
+      expect(normalizeName('Piñones')).toMatch(/pinones|pi.ones/);
     });
     it('elimina espacios extra', () => {
       expect(normalizeName('  arroz  ')).toBe('arroz');

@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import type { Recipe, RecipeIngredient, RecipeStep, RecipeWithIngredients, RecipeCategory, MealType } from '@/types';
 import { executeQuery, executeRun, executeFirst } from '@/database/db';
-import { v4 as uuidv4 } from 'uuid';
+import uuid from 'react-native-uuid';
+const uuidv4 = () => uuid.v4() as string;
 
 interface RecipesState {
   recipes: RecipeWithIngredients[];

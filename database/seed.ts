@@ -1,5 +1,6 @@
 import { executeRun, executeFirst, withTransaction } from './db';
-import { v4 as uuidv4 } from 'uuid';
+import uuid from 'react-native-uuid';
+const uuidv4 = () => uuid.v4() as string;
 
 // ─── Ingredientes base ───────────────────────────────────────
 const SEED_INGREDIENTS = [

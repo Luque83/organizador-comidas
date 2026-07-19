@@ -2,7 +2,8 @@ import { create } from 'zustand';
 import type { Ingredient, IngredientAlias, IngredientConversion, IngredientCategory, Unit } from '@/types';
 import { executeQuery, executeRun } from '@/database/db';
 import { normalizeName, findPossibleDuplicates } from '@/services/ingredientMatcher';
-import { v4 as uuidv4 } from 'uuid';
+import uuid from 'react-native-uuid';
+const uuidv4 = () => uuid.v4() as string;
 
 interface IngredientsState {
   ingredients: Ingredient[];

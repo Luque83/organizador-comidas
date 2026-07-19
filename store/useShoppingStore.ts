@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import type { ShoppingList, ShoppingItem, IngredientCategory, Unit } from '@/types';
 import { executeQuery, executeRun, executeFirst } from '@/database/db';
-import { v4 as uuidv4 } from 'uuid';
+import uuid from 'react-native-uuid';
+const uuidv4 = () => uuid.v4() as string;
 import { useMealPlanStore } from './useMealPlanStore';
 import { useRecipesStore } from './useRecipesStore';
 import { usePantryStore } from './usePantryStore';
